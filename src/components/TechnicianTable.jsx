@@ -13,6 +13,7 @@ import { GET_TECHNICIANS } from "../context/constansts";
 import { useTaskApi } from "../context/taskContext/taskProvider";
 import { getAllTechnicians } from "../networkCalls";
 import { toast } from "react-toastify";
+import { useAuthApi } from "../context/authContext/authProvider";
 
 const TechnicianTable = ({
   setDeleteModal,
@@ -23,9 +24,10 @@ const TechnicianTable = ({
   const [currentPage, setCurrentPage] = useState(0);
   const [showPassword, setShowPassword] = useState(null);
   const { dispatch, state } = useTaskApi();
+  const { state: authState } = useAuthApi();
   const getTechnicians = async () => {
     try {
-      const res = await getAllTechnicians();
+      const res = await getAllTechnicians(authState?.token);
       dispatch({ type: GET_TECHNICIANS, payload: res.data });
     } catch (error) {
       toast.error(

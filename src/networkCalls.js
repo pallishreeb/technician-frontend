@@ -26,8 +26,12 @@ export const deleteBulkJobs = (ids) => {
 
 //technicians apis
 
-export const getAllTechnicians = () => {
-    return Axios.get(`${url}/technician`)
+export const getAllTechnicians = (authtoken) => {
+    return axios.get(`${url}/technician`, {
+        headers: {
+            Authorization: authtoken,
+        },
+    })
 }
 export const addTechnician = (technician) => {
     return Axios.post(`${url}/technician`, technician);
@@ -45,8 +49,12 @@ export const deleteBulkTechnicians = (ids) => {
 
 //apartments apis
 
-export const getAllApartments = () => {
-    return Axios.get(`${url}/apartment`)
+export const getAllApartments = (authtoken) => {
+    return axios.get(`${url}/apartment`, {
+        headers: {
+            Authorization: authtoken,
+        },
+    })
 }
 export const addApartment = (apartment) => {
     return Axios.post(`${url}/apartment`, apartment);

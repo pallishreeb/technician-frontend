@@ -7,7 +7,7 @@ import { getAllApartments } from "../networkCalls";
 import { GET_APARTMENTS } from "../context/constansts";
 import { useTaskApi } from "../context/taskContext/taskProvider";
 import { toast } from "react-toastify";
-
+import { useAuthApi } from "../context/authContext/authProvider";
 const JobTable = ({
   setDeleteModal,
   setModal,
@@ -16,13 +16,15 @@ const JobTable = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const { dispatch, state } = useTaskApi();
+  const { state: authState } = useAuthApi();
   const getApartments = async () => {
     try {
-      const res = await getAllApartments();
+      const res = await getAllApartments(authState?.token);
       dispatch({ type: GET_APARTMENTS, payload: res.data });
     } catch (error) {
       toast.error(
-        error?.response?.data?.message || "Something Went Wrong, Please Try Later"
+        error?.response?.data?.message ||
+          "Something Went Wrong, Please Try Later"
       );
       console.log(error);
     }
@@ -43,13 +45,12 @@ const JobTable = ({
   // Calculate the current page's data
   const offset = currentPage * perPage;
   const currentPageData = state.apartments?.slice(offset, offset + perPage);
-    if (currentPageData.length === 0)
-      return (
-        <div class=" relative flex justify-center items-center mt-4">
-          <FaSpinner className="w-1/6 h-1/6 animate-spin text-purple-500" />
-       
-        </div>
-      );
+  if (currentPageData.length === 0)
+    return (
+      <div class=" relative flex justify-center items-center mt-4">
+        <FaSpinner className="w-1/6 h-1/6 animate-spin text-purple-500" />
+      </div>
+    );
   return (
     <div className="container mx-auto mt-8">
       <div className="w-full overflow-x-scroll shadow-md rounded">
@@ -110,36 +111,33 @@ const JobTable = ({
         </table>
       </div>
       <div className="flex  justify-center items-center mt-4 space-x-2">
-        
-            <span>
-              Total:
-              {state?.apartments?.length}
-            </span>
-            <ReactPaginate
-              previousLabel={"Previous"}
-              nextLabel={"Next"}
-              breakLabel={"..."}
-              pageCount={pageCount}
-              onPageChange={handlePageChange}
-              containerClassName={"pagination  flex mx-auto px-3 gap-2 "}
-              pageClassName={
-                "px-3 py-2 border rounded-md  cursor-pointer transition-colors"
-              }
-              previousClassName={
-                "px-3 py-2 border rounded-md cursor-pointer transition-colors "
-              }
-              nextClassName={
-                "px-3 py-2 border rounded-md cursor-pointer transition-colors"
-              }
-              breakClassName={
-                "px-3 py-2 border rounded-md cursor-pointer transition-colors hover:bg-indigo-500 hover:text-white"
-              }
-              disabledClassName={"bg-gray-500 text-white    "}
-              activeClassName={"bg-indigo-500 text-white"}
-            />
-       
+        <span>
+          Total:
+          {state?.apartments?.length}
+        </span>
+        <ReactPaginate
+          previousLabel={"Previous"}
+          nextLabel={"Next"}
+          breakLabel={"..."}
+          pageCount={pageCount}
+          onPageChange={handlePageChange}
+          containerClassName={"pagination  flex mx-auto px-3 gap-2 "}
+          pageClassName={
+            "px-3 py-2 border rounded-md  cursor-pointer transition-colors"
+          }
+          previousClassName={
+            "px-3 py-2 border rounded-md cursor-pointer transition-colors "
+          }
+          nextClassName={
+            "px-3 py-2 border rounded-md cursor-pointer transition-colors"
+          }
+          breakClassName={
+            "px-3 py-2 border rounded-md cursor-pointer transition-colors hover:bg-indigo-500 hover:text-white"
+          }
+          disabledClassName={"bg-gray-500 text-white    "}
+          activeClassName={"bg-indigo-500 text-white"}
+        />
       </div>
-    
     </div>
   );
 };
