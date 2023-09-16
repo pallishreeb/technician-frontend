@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Apply animation and hover styles to the menu items */
+ul li {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Change color and add a subtle animation on hover */
+body{
+    font-family: 'Poppins';
+}
+.menu ul li:hover {
+    /* #06589f; */
+    color: rgb(162, 75, 171);
+    /* color: rgb(100, 96, 224); */
+    /* Change this color to your desired hover color */
+    transform: scale(1.05);
+}
+
+/* Unique style for the active menu item */
+.active-menu {
+    color: rgb(207, 14, 229);
+  
+    /* Change this color to your desired active menu color */
+    font-weight: bold;
+    /* border-bottom: 2px solid rgb(49 46 129); */
+    /* Add a bottom border to indicate the active menu */
+}
