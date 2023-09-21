@@ -19,7 +19,7 @@ const EventCard = ({ eventDetails }) => {
         <p className="mb-2 ">Assigned to: Sanjay Mehta</p>
         <p className="mb-2 text-red-500"> Due Date: 2009/23/34 </p>
         <p className={`font-semibold ${statusColorClass} text-sm`}>
-          Status: Pending
+          Status: In Progress
         </p>
         <p className=" mb-2">Apartment Name:Apartment One </p>
       </div>

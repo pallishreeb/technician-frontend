@@ -1,4 +1,4 @@
-export const FILTER_BY_PRIORITY = "FILTER_BY_PRIORITY";
+
 export const FILTER_BY_STATUS = "FILTER_BY_STATUS";
 export const REMOVE_FILTER = "REMOVE_FILTER";
 export const LOAD_USER_FAIL = "LOAD_USER_FAIL";

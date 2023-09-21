@@ -12,7 +12,9 @@ import { useAuthApi } from "./context/authContext/authProvider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Events from "./pages/Events";
-
+import AddJob from "./pages/AddJobs"
+import EditJob from "./pages/EditJob"
+import JobDetails from "./pages/Jobdetails";
 function App() {
   const { state } = useAuthApi();
   let admin = state.user
@@ -23,10 +25,13 @@ function App() {
       }
 
 
-      <ToastContainer autoClose={2000} />
+      <ToastContainer autoClose={2000} hideProgressBar={true} />
       {
         admin ? <Routes>
           <Route exact path="/" element={<Jobs />} />
+          <Route exact path="/add-job" element={<AddJob />} />
+          <Route exact path="/edit-job/:id" element={<EditJob />} />
+          <Route exact path="/job/:id" element={<JobDetails />} />
           <Route exact path="/technicians" element={<Technicians />} />
           <Route exact path="/apartments" element={<Apartments />} />
           <Route exact path="/events" element={<Events />} />

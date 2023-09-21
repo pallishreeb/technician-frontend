@@ -8,25 +8,32 @@ import {
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
+  parse,
 } from "date-fns";
 
 const Calendar = () => {
   const events = [
     {
       id: 1,
-      date: "2023-09-10", // Replace with your event dates
+      date: "10/09/2023", // dd/mm/yyyy format
       name: "Event 1",
       details: "Event 1 details",
     },
     {
       id: 2,
-      date: "2023-09-15",
+      date: "15/09/2023",
       name: "Event 2",
       details: "Event 2 details",
     },
     {
       id: 3,
-      date: "2023-10-12",
+      date: "12/10/2023",
+      name: "Birthday",
+      details: "Happy birthday!",
+    },
+    {
+      id: 3,
+      date: "22/09/2023",
       name: "Birthday",
       details: "Happy birthday!",
     },
@@ -58,7 +65,11 @@ const Calendar = () => {
 
   const handleDateClick = (date) => {
     // Check if the clicked date has an event
-    if (events.some((event) => isSameDate(new Date(event.date), date))) {
+    if (
+      events.some((event) =>
+        isSameDate(parse(event.date, "dd/MM/yyyy", new Date()), date)
+      )
+    ) {
       setSelectedDate(date);
     }
   };
@@ -84,31 +95,31 @@ const Calendar = () => {
           </div>
         ))}
         {daysInMonth.map((date) => {
-          const eventDates = events.map((event) => new Date(event.date));
-          const formattedDate = format(date, "yyyy-MM-dd");
+          const eventDates = events.map((event) =>
+            parse(event.date, "dd/MM/yyyy", new Date())
+          );
+          const formattedDate = format(date, "dd/MM/yyyy");
 
           let dateClasses =
             "p-2 border border-gray-200 rounded shadow cursor-pointer";
 
           if (isSameDate(date, currentDate)) {
-            dateClasses += " bg-purple-500"; // Current date
+            dateClasses += "  bg-purple-400"; // Current date
           } else if (
             eventDates.some((eventDate) => isSameDate(eventDate, date))
           ) {
-            const eventDate = new Date(
-              events.find((event) =>
-                isSameDate(new Date(event.date), date)
-              ).date
+            const eventDate = eventDates.find((eventDate) =>
+              isSameDate(eventDate, date)
             );
             if (eventDate > currentDate) {
-              dateClasses += " bg-indigo-500"; // Future date with events
+              dateClasses += " text-white bg-indigo-700"; // Future date with events
             } else {
-              dateClasses += " bg-indigo-500"; // Past date with events
+              dateClasses += " bg-indigo-400"; // Past date with events
             }
           }
 
           if (isSameDate(date, selectedDate)) {
-            dateClasses += " border-red-500"; // Selected date
+            dateClasses += " border-red-800  text-white bg-red-700"; // Selected date
           }
 
           return (

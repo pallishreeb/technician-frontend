@@ -29,15 +29,10 @@ const taskReducer = (state, action) => {
                 tasks: state.tasks.filter(task => task.id !== action.payload),
                 duplicateTasks: state.duplicateTasks.filter(task => task.id !== action.payload),
             }
-        case FILTER_BY_PRIORITY:
-            return {
-                ...state,
-                tasks: state.tasks.filter(task => task.priority === action.payload)
-            }
         case FILTER_BY_STATUS:
             return {
                 ...state,
-                tasks: state.tasks.filter(task => task.status === action.payload)
+                tasks: state.tasks.filter(task => task?.status === action.payload)
             }
         case REMOVE_FILTER:
             return {

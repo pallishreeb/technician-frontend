@@ -7,14 +7,32 @@ const Axios = axios.create({
 })
 // Jobs apis
 
-export const getAllJobs = () => {
-    return Axios.get(`${url}/job`)
+export const getAllJobs = (authtoken) => {
+    return axios.get(`${url}/job`, {
+        headers: {
+            Authorization: authtoken,
+        },
+    })
+}
+export const getJob = (id,authtoken) => {
+    return axios.get(`${url}/job/job-detail?id=${id}`, {
+        headers: {
+            Authorization: authtoken,
+        },
+    })
+}
+export const getAnalytics = (authtoken) =>{
+    return axios.get(`${url}/job/analytics`, {
+        headers: {
+            Authorization: authtoken,
+        },
+    });
 }
 export const addJob = (job) => {
     return Axios.post(`${url}/job`, job);
 }
-export const updateJob = (job, id) => {
-    return Axios.put(`${url}/job?id=${id}`, job)
+export const updateJob = (job) => {
+    return Axios.put(`${url}/job?id=${job.id}`, job)
 }
 export const deleteJob = (id) => {
     return Axios.delete(`${url}/job?id=${id}`)

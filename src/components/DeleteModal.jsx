@@ -1,8 +1,8 @@
 /** @format */
 
 import React from "react";
-import { DELETE_TECHNICIAN, DELETE_APARTMENT } from "../context/constansts";
-import { deleteTechnician, deleteApartment } from "../networkCalls";
+import { DELETE_TECHNICIAN, DELETE_APARTMENT, DELETE_TASK } from "../context/constansts";
+import { deleteTechnician, deleteApartment, deleteJob } from "../networkCalls";
 import { useTaskApi } from "../context/taskContext/taskProvider";
 import { toast } from "react-toastify";
 const DeleteModal = ({
@@ -26,7 +26,11 @@ const DeleteModal = ({
         });
       } else if (itemType === "apartment") {
         deleteApartment(itemToDelete.id).then(() => {
-       dispatch({ type: DELETE_APARTMENT, payload: itemToDelete.id });
+          dispatch({ type: DELETE_APARTMENT, payload: itemToDelete.id });
+        });
+      } else if (itemType === "job") {
+        deleteJob(itemToDelete.id).then(() => {
+          dispatch({ type: DELETE_TASK, payload: itemToDelete.id });
         });
       }
 
@@ -34,10 +38,10 @@ const DeleteModal = ({
       setItemToDelete(null);
       setModal(false);
     } catch (error) {
-        toast.error(
-          error?.response?.data?.message ||
-            "Something Went Wrong, Please Try Later"
-        );
+      toast.error(
+        error?.response?.data?.message ||
+          "Something Went Wrong, Please Try Later"
+      );
       console.log(error);
     }
   };

@@ -1,11 +1,11 @@
 import React, { createContext, useReducer, useContext } from "react";
 import taskReducer from "./taskReducer";
 const initialState = {
-    jobs: [],
-    duplicateJobs: [],
-    technicians:[],
-    apartments:[]
-   
+    tasks: [],
+    duplicateTasks: [],
+    technicians: [],
+    apartments: []
+
 };
 export const TaskContext = createContext(initialState);
 

@@ -30,3 +30,38 @@ body{
     /* border-bottom: 2px solid rgb(49 46 129); */
     /* Add a bottom border to indicate the active menu */
 }
+
+/* Custom dropdown container */
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 200px; /* Adjust as needed */
+}
+
+/* Style the select input to make it visible */
+.my-dropdown {
+  width: 100%;
+  padding: 10px;
+}
+
+/* Options list */
+.options-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1;
+  max-height: 200px; /* Set a max height to make it scrollable */
+  overflow-y: auto; /* Enable vertical scrolling if options exceed the height */
+  border: 1px solid #ccc;
+  border-top: none; /* Remove top border to align with select input */
+}
+
+/* Style individual options */
+.options-list option {
+  padding: 10px;
+  cursor: pointer;
+}
+/* Add this CSS to your stylesheet or a style tag in your component */
+
+
+

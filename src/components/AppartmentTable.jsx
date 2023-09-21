@@ -32,7 +32,7 @@ const JobTable = ({
 
   useEffect(() => {
     getApartments();
-  }, [state.apartments.length]);
+  }, [state.apartments?.length]);
   // Pagination configuration
   const perPage = 10; // Number of items per page
 
