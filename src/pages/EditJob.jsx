@@ -195,7 +195,7 @@ function Form() {
       </div>
     );
   return (
-    <div className="container mx-auto p-4 lg:px-12  ">
+    <div className="container mx-auto p-4 lg:px-12 md:max-w-4xl ">
       <form
         className="grid grid-cols-1 md:grid-cols-2 gap-4"
         onSubmit={handleSubmit}

@@ -12,7 +12,7 @@ import { useAuthApi } from "./context/authContext/authProvider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Events from "./pages/Events";
-import AddJob from "./pages/AddJobs"
+import AddJob from "./pages/AddJob"
 import EditJob from "./pages/EditJob"
 import JobDetails from "./pages/Jobdetails";
 function App() {

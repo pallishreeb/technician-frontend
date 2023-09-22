@@ -28,7 +28,7 @@ const Events = () => {
 
       <Calendar />
       <div className="container mx-auto py-8 w-full md:w-11/12 lg:w-10/12">
-        <h2 className="text-2xl font-semibold mb-4 flex justify-center">
+        <h2 className="text-xl font-semibold mb-4 flex justify-center">
           Events Of The Selected Date
         </h2>
         <div className="grid xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
