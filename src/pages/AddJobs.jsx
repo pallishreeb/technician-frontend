@@ -229,11 +229,13 @@ function Form() {
 
         {/* JobResponsibilities Inputs */}
         <div className="md:col-span-2">
-          <label htmlFor="note">Job responsibilities</label>
-          {jobResponsibilities.map((responsibility, index) => (
+          <label htmlFor="responsibilities">Job responsibilities</label>
+          {jobResponsibilities?.map((responsibility, index) => (
             <div key={index} className="flex items-center gap-2">
               <input
                 type="text"
+                id="responsibilities"
+                name="responsibilities"
                 placeholder="Job Responsibility"
                 value={responsibility}
                 onChange={(e) =>

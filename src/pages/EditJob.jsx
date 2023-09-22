@@ -82,15 +82,17 @@ function Form() {
     getJob(id, authState?.token)
       .then((res) => {
         setJobDetails(res?.data);
-        setJobResponsibilities(res.data.responsibilities);
-        setApartment({
-          id: res.data.apartment,
-          apartmentName: res.data.apartment_name,
+        if(res?.data?.responsibilities?.length > 0){
+          setJobResponsibilities(res.data.responsibilities);
+        }
+      setApartment({
+          id: res.data?.apartment,
+          apartmentName: res.data?.apartment_name,
         });
-        if (res.data.technician && res.data.technician_name) {
+        if (res.data?.technician && res.data?.technician_name) {
           setTechnician({
-            id: res.data.technician,
-            name: res.data.technician_name,
+            id: res.data?.technician,
+            name: res.data?.technician_name,
           });
         }
         if (res?.data?.timeline) {
@@ -298,11 +300,13 @@ function Form() {
 
         {/* JobResponsibilities Inputs */}
         <div className="md:col-span-2">
-          <label htmlFor="note">Job responsibilities</label>
+          <label htmlFor="responsibilities">Job responsibilities</label>
           {jobResponsibilities?.map((responsibility, index) => (
             <div key={index} className="flex items-center gap-2">
               <input
                 type="text"
+                id="responsibilities"
+                name="responsibilities"
                 placeholder="Job Responsibility"
                 value={responsibility}
                 onChange={(e) =>
