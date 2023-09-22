@@ -5,7 +5,7 @@ import { useAuthApi } from "../context/authContext/authProvider";
 import { useTaskApi } from "../context/taskContext/taskProvider";
 import { RiAddLine } from "react-icons/ri";
 import { IoIosRemove } from "react-icons/io";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   ADD_TASK,
   GET_APARTMENTS,
@@ -18,7 +18,6 @@ import { toast } from "react-toastify";
 function Form() {
   const currentDate = new Date().toISOString().split("T")[0];
   const navigate = useNavigate();
-  const { id } = useParams();
   const { state: authState } = useAuthApi();
   const { dispatch, state } = useTaskApi();
   const { apartments, technicians } = state;
@@ -117,7 +116,7 @@ function Form() {
       technician: technician,
       responsibilities: jobResponsibilities,
     };
-    addJob(jobDetails)
+    addJob(jobDetails, authState?.token)
       .then((res) => {
         // console.log(res.data, "add job success");
         setData({

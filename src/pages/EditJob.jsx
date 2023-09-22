@@ -161,7 +161,7 @@ function Form() {
       responsibilities:
         jobResponsibilities[length - 1] !== "" ? jobResponsibilities : [],
     };
-    updateJob(jobForm)
+    updateJob(jobForm,authState?.token)
       .then((res) => {
         setJobDetails(null);
         setApartment(null);

@@ -28,17 +28,33 @@ export const getAnalytics = (authtoken) =>{
         },
     });
 }
-export const addJob = (job) => {
-    return Axios.post(`${url}/job`, job);
+export const addJob = (job,authtoken) => {
+    return axios.post(`${url}/job`, job, {
+        headers: {
+            Authorization: authtoken,
+        },
+    });
 }
-export const updateJob = (job) => {
-    return Axios.put(`${url}/job?id=${job.id}`, job)
+export const updateJob = (job,authtoken) => {
+    return axios.put(`${url}/job?id=${job.id}`, job, {
+        headers: {
+            Authorization: authtoken,
+        },
+    })
 }
-export const deleteJob = (id) => {
-    return Axios.delete(`${url}/job?id=${id}`)
+export const deleteJob = (id,authtoken) => {
+    return axios.delete(`${url}/job?id=${id}`, {
+        headers: {
+            Authorization: authtoken,
+        },
+    })
 }
-export const deleteBulkJobs = (ids) => {
-    return Axios.delete(`${url}/job/bulk-delete`, ids)
+export const deleteBulkJobs = (ids,authtoken) => {
+    return axios.delete(`${url}/job/bulk-delete`, ids, {
+        headers: {
+            Authorization: authtoken,
+        },
+    })
 }
 
 

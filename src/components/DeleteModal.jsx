@@ -5,6 +5,7 @@ import { DELETE_TECHNICIAN, DELETE_APARTMENT, DELETE_TASK } from "../context/con
 import { deleteTechnician, deleteApartment, deleteJob } from "../networkCalls";
 import { useTaskApi } from "../context/taskContext/taskProvider";
 import { toast } from "react-toastify";
+import { useAuthApi } from "../context/authContext/authProvider";
 const DeleteModal = ({
   setModal,
   modal,
@@ -13,7 +14,7 @@ const DeleteModal = ({
   setItemToDelete,
 }) => {
   const { dispatch } = useTaskApi();
-
+  const { state: authState } = useAuthApi();
   const handleDelete = async () => {
     try {
       if (!itemType || !itemToDelete) {
@@ -29,7 +30,7 @@ const DeleteModal = ({
           dispatch({ type: DELETE_APARTMENT, payload: itemToDelete.id });
         });
       } else if (itemType === "job") {
-        deleteJob(itemToDelete.id).then(() => {
+        deleteJob(itemToDelete?.id, authState?.token).then(() => {
           dispatch({ type: DELETE_TASK, payload: itemToDelete.id });
         });
       }
