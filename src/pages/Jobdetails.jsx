@@ -72,13 +72,13 @@ function JobDetails() {
     <div className="bg-gray-100 min-h-screen p-4 md:p-8">
       <div className="container mx-auto p-2 md:p-4">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           className="bg-indigo-500 text-white py-2 px-4 rounded-md flex items-center space-x-2"
         >
           <FaArrowLeft />
           <span>Go Back</span>
         </button>
-        <div className="bg-white rounded-lg shadow-lg p-4 mt-8 lg:mt-0 lg:mx-auto lg:w-3/4 xl:w-1/2 hover:shadow-xl transition duration-300">
+        <div className="bg-white rounded-lg shadow-lg p-6 mt-8 lg:mt-0 lg:mx-auto lg:w-3/4 xl:w-1/2 hover:shadow-xl transition duration-300 relative">
           <h1 className="text-xl font-semibold">{jobDetails?.title}</h1>
           <p className="text-gray-500">{jobDetails?.description || "NA"}</p>
           <div className="flex items-center mt-4">
@@ -132,6 +132,13 @@ function JobDetails() {
               <b>NA</b>
             )}
           </div>
+          <button
+            onClick={() => navigate(`/edit-job/${jobDetails?.id}`)}
+            className="bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center
+              absolute  bottom-3 right-2 mt-5 ml-3"
+          >
+            <span>Edit</span>
+          </button>
         </div>
       </div>
     </div>

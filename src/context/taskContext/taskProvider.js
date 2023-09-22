@@ -4,8 +4,7 @@ const initialState = {
     tasks: [],
     duplicateTasks: [],
     technicians: [],
-    apartments: []
-
+    apartments: [],
 };
 export const TaskContext = createContext(initialState);
 

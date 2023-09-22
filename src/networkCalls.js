@@ -14,42 +14,42 @@ export const getAllJobs = (authtoken) => {
         },
     })
 }
-export const getJob = (id,authtoken) => {
+export const getJob = (id, authtoken) => {
     return axios.get(`${url}/job/job-detail?id=${id}`, {
         headers: {
             Authorization: authtoken,
         },
     })
 }
-export const getAnalytics = (authtoken) =>{
+export const getAnalytics = (authtoken) => {
     return axios.get(`${url}/job/analytics`, {
         headers: {
             Authorization: authtoken,
         },
     });
 }
-export const addJob = (job,authtoken) => {
+export const addJob = (job, authtoken) => {
     return axios.post(`${url}/job`, job, {
         headers: {
             Authorization: authtoken,
         },
     });
 }
-export const updateJob = (job,authtoken) => {
+export const updateJob = (job, authtoken) => {
     return axios.put(`${url}/job?id=${job.id}`, job, {
         headers: {
             Authorization: authtoken,
         },
     })
 }
-export const deleteJob = (id,authtoken) => {
+export const deleteJob = (id, authtoken) => {
     return axios.delete(`${url}/job?id=${id}`, {
         headers: {
             Authorization: authtoken,
         },
     })
 }
-export const deleteBulkJobs = (ids,authtoken) => {
+export const deleteBulkJobs = (ids, authtoken) => {
     return axios.delete(`${url}/job/bulk-delete`, ids, {
         headers: {
             Authorization: authtoken,
@@ -57,7 +57,22 @@ export const deleteBulkJobs = (ids,authtoken) => {
     })
 }
 
+// get all dates with job
 
+export const getTimelines = (authtoken) => {
+    return axios.get(`${url}/job/timeline-dates`, {
+        headers: {
+            Authorization: authtoken,
+        },
+    })
+}
+export const filterBydates = (date, authtoken) => {
+    return axios.get(`${url}/job/filter-by-date?date=${date}`, {
+        headers: {
+            Authorization: authtoken,
+        },
+    })
+}
 //technicians apis
 
 export const getAllTechnicians = (authtoken) => {
