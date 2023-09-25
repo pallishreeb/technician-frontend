@@ -21,6 +21,7 @@ import {
 import ApartmentSelect from "../components/ApartmentSelect";
 import TechnicianSelect from "../components/TechnicianSelect";
 import { toast } from "react-toastify";
+import { format } from "date-fns";
 function Form() {
   const currentDate = new Date().toISOString().split("T")[0];
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ function Form() {
   };
   function convertDateFormat(inputDate) {
     // Split the input date string into day, month, and year components
-    const dateComponents = inputDate.split("/");
+    const dateComponents = inputDate.split("-");
     // Ensure that there are three components (day, month, and year)
     if (dateComponents.length === 3) {
       const day = dateComponents[0];
@@ -82,10 +83,10 @@ function Form() {
     getJob(id, authState?.token)
       .then((res) => {
         setJobDetails(res?.data);
-        if(res?.data?.responsibilities?.length > 0){
+        if (res?.data?.responsibilities?.length > 0) {
           setJobResponsibilities(res.data.responsibilities);
         }
-      setApartment({
+        setApartment({
           id: res.data?.apartment,
           apartmentName: res.data?.apartment_name,
         });
@@ -151,9 +152,8 @@ function Form() {
   const handleSubmit = (e) => {
     setLoading(true);
     e.preventDefault();
-    const formatted =
-      jobDetails?.timeline &&
-      new Date(jobDetails.timeline).toLocaleDateString("en-GB");
+    const date = jobDetails?.timeline ? new Date(jobDetails.timeline) : null;
+    const formatted = date !== null && format(date, "dd-MM-yyyy");
     const length = jobResponsibilities.length;
     const jobForm = {
       ...jobDetails,
@@ -163,7 +163,7 @@ function Form() {
       responsibilities:
         jobResponsibilities[length - 1] !== "" ? jobResponsibilities : [],
     };
-    updateJob(jobForm,authState?.token)
+    updateJob(jobForm, authState?.token)
       .then((res) => {
         setJobDetails(null);
         setApartment(null);

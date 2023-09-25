@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useAuthApi } from "../context/authContext/authProvider";
 import { useTaskApi } from "../context/taskContext/taskProvider";
 import { RiAddLine } from "react-icons/ri";
+import { format } from "date-fns";
 import { IoIosRemove } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import {
@@ -95,8 +96,9 @@ function Form() {
       setLoading(false);
       return toast.warning("Please Choose The Technician");
     }
-    const formatted =
-      data?.timeline && new Date(data.timeline).toLocaleDateString("en-GB");
+    const date = data?.timeline ? new Date(data.timeline) : null;
+    const formatted = date !== null && format(date, "dd-MM-yyyy");
+    console.log(formatted);
     const status = technician && data?.timeline ? "Assigned" : "Unscheduled";
     const length = jobResponsibilities.length;
     const jobDetails = {

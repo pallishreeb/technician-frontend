@@ -9,7 +9,6 @@ import {
   endOfMonth,
   eachDayOfInterval,
   parse,
-
   getDay, // Import startOfWeek
 } from "date-fns";
 import { FaSpinner } from "react-icons/fa";
@@ -73,7 +72,7 @@ const Calendar = ({ selectedDate, setSelectedDate,loading,setLoading }) => {
     // Check if the clicked date has an event
     if (
       tasks.some((task) => {
-        const taskDate = parse(task.timeline, "dd/MM/yyyy", new Date());
+        const taskDate = parse(task.timeline, "dd-MM-yyyy", new Date());
         return isSameDate(taskDate, date);
       })
     ) {
@@ -111,7 +110,7 @@ const Calendar = ({ selectedDate, setSelectedDate,loading,setLoading }) => {
           <div key={`empty-${index}`} className="text-center"></div>
         ))}
         {daysInMonth.map((date) => {
-          const formattedDate = format(date, "dd/MM/yyyy");
+          const formattedDate = format(date, "dd-MM-yyyy");
 
           let dateClasses =
             "p-2 border border-gray-200 rounded shadow cursor-pointer";
@@ -120,15 +119,15 @@ const Calendar = ({ selectedDate, setSelectedDate,loading,setLoading }) => {
             dateClasses += " bg-purple-400"; // Current date
           } else if (
             tasks.some((task) => {
-              const taskDate = parse(task.timeline, "dd/MM/yyyy", new Date());
+              const taskDate = parse(task.timeline, "dd-MM-yyyy", new Date());
               return isSameDate(taskDate, date);
             })
           ) {
             const task = tasks.find((task) => {
-              const taskDate = parse(task.timeline, "dd/MM/yyyy", new Date());
+              const taskDate = parse(task.timeline, "dd-MM-yyyy", new Date());
               return isSameDate(taskDate, date);
             });
-            const taskDate = parse(task.timeline, "dd/MM/yyyy", new Date());
+            const taskDate = parse(task.timeline, "dd-MM-yyyy", new Date());
             if (taskDate > currentDate) {
               dateClasses += " text-white bg-indigo-700"; // Future date with events
             } else {

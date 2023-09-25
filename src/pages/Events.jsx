@@ -35,7 +35,7 @@ const Events = () => {
         });
     };
     if (selectedDate) {
-      const formattedDate = format(selectedDate, "dd/MM/yyyy");
+      const formattedDate = format(selectedDate, "dd-MM-yyyy");
       filterTasksByDate(formattedDate);
     }
   }, [selectedDate]);
