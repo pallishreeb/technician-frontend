@@ -36,6 +36,8 @@ function Form() {
   const [jobDetails, setJobDetails] = useState(null);
   const [apartment, setApartment] = useState(null);
   const [technician, setTechnician] = useState(null);
+  const [previousTimeline, setPreviousTimeline] = useState("");
+ 
   const handleChange = (e) => {
     setJobDetails((prevState) => ({
       ...prevState,
@@ -100,6 +102,7 @@ function Form() {
           const format = convertDateFormat(res?.data?.timeline);
           setJobDetails((prev) => ({ ...prev, timeline: format }));
         }
+        setPreviousTimeline(res?.data?.timeline)
         setJobLoading(false);
       })
       .catch((error) => {
@@ -162,7 +165,14 @@ function Form() {
       technician: technician.id,
       responsibilities:
         jobResponsibilities[length - 1] !== "" ? jobResponsibilities : [],
+      status:
+        previousTimeline === "" &&
+        jobDetails?.timeline &&
+        jobDetails?.status === "Unscheduled"
+          ? "Assigned"
+          : jobDetails?.status,
     };
+
     updateJob(jobForm, authState?.token)
       .then((res) => {
         setJobDetails(null);
