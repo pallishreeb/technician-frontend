@@ -24,18 +24,28 @@ const DeleteModal = ({
       if (itemType === "technician") {
         deleteTechnician(itemToDelete.id).then(() => {
           dispatch({ type: DELETE_TECHNICIAN, payload: itemToDelete.id });
+          toast.success("Item Deleted");
+        }).catch((error) =>{
+          toast.error(error?.response?.data?.message ||
+            "Something Went Wrong, Please Try Later")
         });
       } else if (itemType === "apartment") {
         deleteApartment(itemToDelete.id).then(() => {
           dispatch({ type: DELETE_APARTMENT, payload: itemToDelete.id });
+          toast.success("Item Deleted");
+        }).catch((error) =>{
+          toast.error(error?.response?.data?.message ||
+            "Something Went Wrong, Please Try Later")
         });
       } else if (itemType === "job") {
         deleteJob(itemToDelete?.id, authState?.token).then(() => {
           dispatch({ type: DELETE_TASK, payload: itemToDelete.id });
+          toast.success("Item Deleted");
+        }).catch((error) =>{
+          toast.error(error?.response?.data?.message ||
+            "Something Went Wrong, Please Try Later")
         });
-      }
-
-      toast.success("Item Deleted");
+      }    
       setItemToDelete(null);
       setModal(false);
     } catch (error) {

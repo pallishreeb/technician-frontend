@@ -7,6 +7,7 @@ import {
   FaInfoCircle,
   FaArrowLeft,
   FaSpinner,
+  FaUpload
 } from "react-icons/fa";
 import { BsFileText, BsBuilding } from "react-icons/bs";
 import { AiOutlineTag } from "react-icons/ai";
@@ -124,16 +125,7 @@ function JobDetails() {
   return (
     <div className="bg-gray-100 min-h-screen p-0 md:p-0">
       <div className="container mx-auto p-2 md:p-4">
-        {deleteModalShow && (
-          <DeleteImageModal
-            setModal={setDeleteModalShow}
-            jobId={id}
-            imageName={selectedImage}
-            imageUrls={imageUrls}
-            setImageUrls={setImageUrls}
-            setSelectedImage={setSelectedImage}
-          />
-        )}
+     
         <button
           onClick={() => navigate(-1)}
           className="bg-indigo-500 text-white py-2 px-4 rounded-md flex items-center space-x-2"
@@ -217,8 +209,18 @@ function JobDetails() {
               ))}
           </div>
           {/* Display selected image */}
+          {deleteModalShow && (
+          <DeleteImageModal
+            setModal={setDeleteModalShow}
+            jobId={id}
+            imageName={selectedImage}
+            imageUrls={imageUrls}
+            setImageUrls={setImageUrls}
+            setSelectedImage={setSelectedImage}
+          />
+        )}
           {selectedImage !== null && (
-            <div className="mt-3 relative md:w-10/12">
+            <div className="mt-3 relative ">
               <div
                 className="w-full h-64  sm:h-80 md:h-90  xl:h-120 bg-cover bg-center rounded"
                 style={{ backgroundImage: `url(${imgUrl + selectedImage})` }}
@@ -235,6 +237,7 @@ function JobDetails() {
 
           <div className="mt-6">
             <form onSubmit={handleSubmit} className="flex flex-col items-start">
+            
               <label className="mb-2">Upload Images:</label>
               <div className="flex flex-col md:flex-row items-start">
                 <input
@@ -253,6 +256,7 @@ function JobDetails() {
                   }`}
                   disabled={images?.length === 0 || submitting}
                 >
+                  <FaUpload className="text-white inline-block mr-2" />
                   Upload
                 </button>
               </div>
