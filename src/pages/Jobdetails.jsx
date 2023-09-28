@@ -13,7 +13,8 @@ import { AiOutlineTag } from "react-icons/ai";
 import { AiOutlineMail } from "react-icons/ai";
 import { useAuthApi } from "../context/authContext/authProvider";
 import { useNavigate, useParams } from "react-router-dom";
-
+import axios from "axios";
+import { imgUrl, url } from "../config";
 import { getJob } from "../networkCalls";
 import { toast } from "react-toastify";
 function JobDetails() {
@@ -22,6 +23,8 @@ function JobDetails() {
   const { state: authState } = useAuthApi();
   const [jobDetails, setJobDetails] = useState();
   const [loading, setLoading] = useState(false);
+  const [images, setImages] = useState([]);
+  const [imageUrls, setImageUrls] = useState([]);
   const getJobDetails = async () => {
     setLoading(true);
     getJob(id, authState?.token)
@@ -44,7 +47,17 @@ function JobDetails() {
       getJobDetails();
     }
   }, [id]);
-
+  useEffect(() => {
+    // Make a GET request to fetch the image URLs for the job
+    axios
+      .get(`${url}/upload/get-images?jobId=${id}`)
+      .then((response) => {
+        setImageUrls(response.data.imageUrls);
+      })
+      .catch((error) => {
+        console.error("Error fetching images:", error);
+      });
+  }, [id]);
   const getStatusColor = () => {
     switch (jobDetails?.status) {
       case "Assigned":
@@ -67,7 +80,44 @@ function JobDetails() {
         <FaSpinner className="w-1/6 h-1/6 animate-spin text-purple-500" />
       </div>
     );
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    const formData = new FormData();
+
+    for (let i = 0; i < images.length; i++) {
+      formData.append("images", images[i]);
+    }
+
+    try {
+      const response = await axios.patch(
+        `${url}/upload/update-images?jobId=${id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      toast.success(response?.data?.message);
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Error in image uplod,please try later");
+    }
+  };
+
+  const deleteImage = (id,imageName) => {
+    axios
+      .delete(`${url}/upload/delete-image?jobId=${id}&imageName=${imageName}`)
+      .then((response) => {
+        console.log("response from delete",response)
+        toast.success(response?.data?.message)
+      })
+      .catch((error) => {
+        console.error("Error fetching images:", error);
+        toast.error("Error in deleting image,please try later")
+      });
+  }
   return (
     <div className="bg-gray-100 min-h-screen p-4 md:p-8">
       <div className="container mx-auto p-2 md:p-4">
@@ -139,6 +189,28 @@ function JobDetails() {
           >
             <span>Edit</span>
           </button>
+          <div className="display-imgs">
+      {imageUrls?.map((imageUrl, index) => (
+        <>
+            <img key={index} src={`${imgUrl}`+ imageUrl} alt={`thumb ${index + 1}`} />
+            <button onClick={() => deleteImage(id,imageUrl)} className="bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center">Delete</button>
+        </>
+    
+      ))}
+     </div>
+          <div className="image-upload">
+            <form onSubmit={handleSubmit}>
+              <div>
+                <label>Images:</label>
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => setImages(e.target.files)}
+                />
+              </div>
+              <button type="submit" className="bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center" disabled={images.length === 0}>Upload</button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
