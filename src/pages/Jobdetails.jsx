@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   FaUser,
   FaCalendarAlt,
@@ -13,10 +13,10 @@ import { AiOutlineTag } from "react-icons/ai";
 import { AiOutlineMail } from "react-icons/ai";
 import { useAuthApi } from "../context/authContext/authProvider";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import { imgUrl, url } from "../config";
-import { getJob } from "../networkCalls";
+import { imgUrl } from "../config";
+import { getImages, getJob, uploadImages } from "../networkCalls";
 import { toast } from "react-toastify";
+import DeleteImageModal from "../components/ImageDeleteModal";
 function JobDetails() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -25,6 +25,10 @@ function JobDetails() {
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState([]);
   const [imageUrls, setImageUrls] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [deleteModalShow, setDeleteModalShow] = useState(false);
+  const fileInputRef = useRef(null);
+  const [submitting, setSubmitting] = useState(false);
   const getJobDetails = async () => {
     setLoading(true);
     getJob(id, authState?.token)
@@ -42,22 +46,31 @@ function JobDetails() {
         console.log(error);
       });
   };
-  useEffect(() => {
-    if (id) {
-      getJobDetails();
-    }
-  }, [id]);
-  useEffect(() => {
-    // Make a GET request to fetch the image URLs for the job
-    axios
-      .get(`${url}/upload/get-images?jobId=${id}`)
-      .then((response) => {
-        setImageUrls(response.data.imageUrls);
+  const getImagesFnc = async () => {
+    getImages(id, authState?.token)
+      .then((res) => {
+        if (res.data.imageUrls.length > 0) {
+          setImageUrls(res.data.imageUrls);
+          setSelectedImage(res.data.imageUrls[0]);
+          console.log(imageUrls);
+        } else {
+          setImageUrls([]);
+          setSelectedImage(null);
+        }
       })
       .catch((error) => {
+        toast.error(
+          error?.response?.data?.message ||
+            "Something Went Wrong, Please Try Later"
+        );
         console.error("Error fetching images:", error);
       });
+  };
+  useEffect(() => {
+    getJobDetails();
+    getImagesFnc();
   }, [id]);
+
   const getStatusColor = () => {
     switch (jobDetails?.status) {
       case "Assigned":
@@ -80,47 +93,47 @@ function JobDetails() {
         <FaSpinner className="w-1/6 h-1/6 animate-spin text-purple-500" />
       </div>
     );
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
+    setSubmitting(true);
     const formData = new FormData();
-
     for (let i = 0; i < images.length; i++) {
       formData.append("images", images[i]);
     }
-
-    try {
-      const response = await axios.patch(
-        `${url}/upload/update-images?jobId=${id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      toast.success(response?.data?.message);
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("Error in image uplod,please try later");
-    }
-  };
-
-  const deleteImage = (id,imageName) => {
-    axios
-      .delete(`${url}/upload/delete-image?jobId=${id}&imageName=${imageName}`)
+    uploadImages(id, formData, authState?.token)
       .then((response) => {
-        console.log("response from delete",response)
-        toast.success(response?.data?.message)
+        setImages([]);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        const newImageURls = response.data.newImageUrls;
+        setImageUrls([...newImageURls]);
+        setSelectedImage(newImageURls[newImageURls.length - 1]);
+        setSubmitting(false);
+        toast.success(response?.data?.message);
       })
       .catch((error) => {
-        console.error("Error fetching images:", error);
-        toast.error("Error in deleting image,please try later")
+        console.error("Error:", error);
+        setSubmitting(false);
+        toast.error(
+          error?.response?.data?.message ||
+            "Something Went Wrong, Please Try Later"
+        );
       });
-  }
+  };
   return (
-    <div className="bg-gray-100 min-h-screen p-4 md:p-8">
+    <div className="bg-gray-100 min-h-screen p-0 md:p-0">
       <div className="container mx-auto p-2 md:p-4">
+        {deleteModalShow && (
+          <DeleteImageModal
+            setModal={setDeleteModalShow}
+            jobId={id}
+            imageName={selectedImage}
+            imageUrls={imageUrls}
+            setImageUrls={setImageUrls}
+            setSelectedImage={setSelectedImage}
+          />
+        )}
         <button
           onClick={() => navigate(-1)}
           className="bg-indigo-500 text-white py-2 px-4 rounded-md flex items-center space-x-2"
@@ -128,7 +141,7 @@ function JobDetails() {
           <FaArrowLeft />
           <span>Go Back</span>
         </button>
-        <div className="bg-white rounded-lg shadow-lg p-6 mt-8 lg:mt-0 lg:mx-auto lg:w-3/4 xl:w-1/2 hover:shadow-xl transition duration-300 relative">
+        <div className="bg-white rounded-lg shadow-lg p-5 md:p-8 mt-8 lg:mt-0 lg:mx-auto lg:w-7/12 hover:shadow-xl transition duration-300 relative ">
           <h1 className="text-xl font-semibold">{jobDetails?.title}</h1>
           <p className="text-gray-500">{jobDetails?.description || "NA"}</p>
           <div className="flex items-center mt-4">
@@ -182,35 +195,75 @@ function JobDetails() {
               <b>NA</b>
             )}
           </div>
-          <button
-            onClick={() => navigate(`/edit-job/${jobDetails?.id}`)}
-            className="bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center
-              absolute  bottom-3 right-2 mt-5 ml-3"
-          >
-            <span>Edit</span>
-          </button>
-          <div className="display-imgs">
-      {imageUrls?.map((imageUrl, index) => (
-        <>
-            <img key={index} src={`${imgUrl}`+ imageUrl} alt={`thumb ${index + 1}`} />
-            <button onClick={() => deleteImage(id,imageUrl)} className="bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center">Delete</button>
-        </>
-    
-      ))}
-     </div>
-          <div className="image-upload">
-            <form onSubmit={handleSubmit}>
-              <div>
-                <label>Images:</label>
+
+          <div className="flex space-x-4 mt-4 overflow-x-auto">
+            {imageUrls?.length > 1 &&
+              imageUrls?.map((imageUrl, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(imageUrl)}
+                  className={`w-10 h-10 rounded-full overflow-hidden focus:outline-none ${
+                    selectedImage === imageUrl
+                      ? "border-2 border-indigo-500"
+                      : ""
+                  }`}
+                >
+                  <img
+                    src={imgUrl + imageUrl}
+                    alt={`thumb ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+          </div>
+          {/* Display selected image */}
+          {selectedImage !== null && (
+            <div className="mt-3 relative md:w-10/12">
+              <div
+                className="w-full h-64  sm:h-80 md:h-90  xl:h-120 bg-cover bg-center rounded"
+                style={{ backgroundImage: `url(${imgUrl + selectedImage})` }}
+              />
+              {/* Delete button */}
+              <button
+                onClick={() => setDeleteModalShow(true)}
+                className="absolute top-2 right-2 bg-red-500 text-white py-2 px-4 rounded-md focus:outline-none"
+              >
+                Delete
+              </button>
+            </div>
+          )}
+
+          <div className="mt-6">
+            <form onSubmit={handleSubmit} className="flex flex-col items-start">
+              <label className="mb-2">Upload Images:</label>
+              <div className="flex flex-col md:flex-row items-start">
                 <input
                   type="file"
                   multiple
                   onChange={(e) => setImages(e.target.files)}
+                  ref={fileInputRef}
+                  className="mb-2 md:mr-2"
                 />
+                <button
+                  type="submit"
+                  className={` text-white py-2 px-4 rounded-md  ${
+                    images?.length === 0 || submitting
+                      ? "bg-indigo-500 cursor-not-allowed"
+                      : "bg-indigo-700 cursor-pointer"
+                  }`}
+                  disabled={images?.length === 0 || submitting}
+                >
+                  Upload
+                </button>
               </div>
-              <button type="submit" className="bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center" disabled={images.length === 0}>Upload</button>
             </form>
           </div>
+          <button
+            onClick={() => navigate(`/edit-job/${jobDetails?.id}`)}
+            className="bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center mt-6"
+          >
+            <span>Edit</span>
+          </button>
         </div>
       </div>
     </div>

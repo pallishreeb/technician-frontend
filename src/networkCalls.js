@@ -1,5 +1,6 @@
 import axios from "axios";
-import { url } from "./config";
+import { url, imgUrl } from "./config";
+
 const Axios = axios.create({
     headers: {
         Authorization: JSON.parse(localStorage.getItem("token"))
@@ -118,3 +119,32 @@ export const deleteBulkApartments = (ids) => {
     return Axios.delete(`${url}/apartment/bulk-delete`, ids)
 }
 
+// image apis
+
+export const getImages = (jobId, authtoken) => {
+    return axios
+        .get(`${url}/upload/get-images?jobId=${jobId}`, {
+            headers: {
+                Authorization: authtoken,
+            },
+        })
+}
+
+export const uploadImages = (jobId, imagesForm, authtoken) => {
+    return axios
+        .patch(`${url}/upload/update-images?jobId=${jobId}`, imagesForm, {
+            headers: {
+                "Authorization": authtoken,
+                "Content-Type": "multipart/form-data",
+            },
+        })
+}
+
+export const deleteImage = (jobId, imageName, authtoken) => {
+    return axios
+        .delete(`${url}/upload/delete-image?jobId=${jobId}&imageName=${imageName}`, {
+            headers: {
+                Authorization: authtoken,
+            },
+        })
+} 
