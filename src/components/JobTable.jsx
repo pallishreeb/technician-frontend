@@ -31,14 +31,14 @@ const JobTable = ({ setDeleteModal, tasks, setJobToDelete }) => {
         return "text-black bg-slate-200";
     }
   };
-function trimStringToLimit(inputString, limit) {
-  if (inputString.length > limit) {
-    // Use the slice method to get a substring up to the specified limit
-    return inputString.slice(0, limit) + "...";
+  function trimStringToLimit(inputString, limit) {
+    if (inputString.length > limit) {
+      // Use the slice method to get a substring up to the specified limit
+      return inputString.slice(0, limit) + "...";
+    }
+    // If the string is already within the limit, return it as is
+    return inputString;
   }
-  // If the string is already within the limit, return it as is
-  return inputString;
-}
   // Calculate the current page's data
   const offset = currentPage * perPage;
   const currentPageData = tasks.slice(offset, offset + perPage);
@@ -78,7 +78,7 @@ function trimStringToLimit(inputString, limit) {
                   className="py-2 px-2 md:py-3 md:px-6 text-xs md:text-sm text-left whitespace-nowrap cursor-pointer"
                   onClick={() => navigate(`/job/${job?.id}`)}
                 >
-                  {trimStringToLimit(job?.title,25)}
+                  {trimStringToLimit(job?.title, 25)}
                 </td>
                 <td className="py-2 px-2 md:py-3 md:px-6 text-xs md:text-sm text-left whitespace-nowrap">
                   {job?.technician_name || "NA"}
@@ -87,7 +87,8 @@ function trimStringToLimit(inputString, limit) {
                   {job?.apartment_name || "NA"}
                 </td>
                 <td className="py-2 px-2 md:py-3 md:px-6 text-xs md:text-sm text-left whitespace-nowrap">
-                  {job?.timeline || "NA"}
+                  <span>{job?.timeline || "NA"} </span>
+                  <span> {job?.duetime || ""}</span>
                 </td>
                 <td className="py-2 px-2 md:py-3 md:px-6 text-xs md:text-sm text-left whitespace-nowrap">
                   <span

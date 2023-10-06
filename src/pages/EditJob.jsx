@@ -21,7 +21,7 @@ import {
 import ApartmentSelect from "../components/ApartmentSelect";
 import TechnicianSelect from "../components/TechnicianSelect";
 import { toast } from "react-toastify";
-import { format } from "date-fns";
+import { format, parse, parseISO } from "date-fns";
 function Form() {
   const currentDate = new Date().toISOString().split("T")[0];
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ function Form() {
   const [apartment, setApartment] = useState(null);
   const [technician, setTechnician] = useState(null);
   const [previousTimeline, setPreviousTimeline] = useState("");
- 
+
   const handleChange = (e) => {
     setJobDetails((prevState) => ({
       ...prevState,
@@ -61,29 +61,37 @@ function Form() {
     updatedResponsibilities[index] = value;
     setJobResponsibilities(updatedResponsibilities);
   };
-  function convertDateFormat(inputDate) {
-    // Split the input date string into day, month, and year components
+
+  const convertDateFormat = (inputDate) => {
     const dateComponents = inputDate.split("-");
-    // Ensure that there are three components (day, month, and year)
     if (dateComponents.length === 3) {
-      const day = dateComponents[0];
-      const month = dateComponents[1];
-      const year = dateComponents[2];
-
-      // Reorder the components to create the "yyyy-mm-dd" format
-      const formattedDate = `${year}-${month}-${day}`;
-
-      return formattedDate;
+      const [day, month, year] = dateComponents;
+      return `${year}-${month}-${day}`;
     } else {
-      // If the input date format is not valid, return an error message or handle it as needed
       return inputDate;
     }
-  }
+  };
+  function convertApiDateTimeToLocal(apiDate, apiTime) {
+    // Combine date and time strings
+    const combinedDateTimeString = `${apiDate} ${apiTime}`;
 
+    // Parse the combined string into a Date object
+    const parsedDateTime = parse(
+      combinedDateTimeString,
+      "dd-MM-yyyy hh:mm aa",
+      new Date()
+    );
+
+    // Format the Date object into a string compatible with datetime-local input
+    const formattedDateTime = format(parsedDateTime, "yyyy-MM-dd'T'HH:mm");
+
+    return formattedDateTime;
+  }
   const getJobDetails = async () => {
     setJobLoading(true);
     getJob(id, authState?.token)
       .then((res) => {
+        console.log(res.data);
         setJobDetails(res?.data);
         if (res?.data?.responsibilities?.length > 0) {
           setJobResponsibilities(res.data.responsibilities);
@@ -98,11 +106,15 @@ function Form() {
             name: res.data?.technician_name,
           });
         }
-        if (res?.data?.timeline) {
-          const format = convertDateFormat(res?.data?.timeline);
-          setJobDetails((prev) => ({ ...prev, timeline: format }));
+
+        if (res?.data?.timeline && res?.data?.duetime) {
+          const formattedDateTime = convertApiDateTimeToLocal(
+            res.data.timeline,
+            res.data.duetime
+          );
+          setJobDetails((prev) => ({ ...prev, timeline: formattedDateTime }));
         }
-        setPreviousTimeline(res?.data?.timeline)
+        setPreviousTimeline(res?.data?.timeline);
         setJobLoading(false);
       })
       .catch((error) => {
@@ -155,13 +167,22 @@ function Form() {
   const handleSubmit = (e) => {
     setLoading(true);
     e.preventDefault();
-    const date = jobDetails?.timeline ? new Date(jobDetails.timeline) : null;
-    const formatted = date !== null && format(date, "dd-MM-yyyy");
+    // Split date and time from the datetime-local input
+    const dateTimeValue = jobDetails?.timeline;
+    const [datePart, timePart] = dateTimeValue.split("T");
+    // Format the date and time for the API
+    const date = datePart ? parse(datePart, "yyyy-MM-dd", new Date()) : null;
+    const formattedDate = date !== null ? format(date, "dd-MM-yyyy") : null;
+
+    const parsedTime = parse(timePart, "HH:mm", new Date());
+    const formattedTime =
+      parsedTime !== null ? format(parsedTime, "hh:mm aa") : null;
     const length = jobResponsibilities.length;
     const jobForm = {
       ...jobDetails,
-      timeline: jobDetails?.timeline && formatted,
+      timeline: jobDetails?.timeline && formattedDate,
       apartment: apartment.id,
+      duetime: jobDetails?.timeline && formattedTime,
       technician: technician.id,
       responsibilities:
         jobResponsibilities[length - 1] !== "" ? jobResponsibilities : [],
@@ -281,10 +302,10 @@ function Form() {
         <div>
           <label htmlFor="timeline">Date</label>
           <input
-            type="date"
+            type="datetime-local"
             id="timeline"
             name="timeline"
-            min={currentDate}
+            // min={currentDate}
             value={jobDetails?.timeline}
             onChange={(e) => {
               handleChange(e);

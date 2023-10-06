@@ -1,10 +1,8 @@
-
+/** @format */
 
 import React from "react";
 
-
 const EventCard = ({ taskDetails }) => {
-
   const getStatusColor = () => {
     switch (taskDetails.status) {
       case "Assigned":
@@ -31,8 +29,11 @@ const EventCard = ({ taskDetails }) => {
           <p className="text-gray-700">{taskDetails?.technician_name}</p>
         </div>
         <div className="flex items-center gap-2 mb-2">
-          <p>Due Date : </p>
-          <p className="text-red-600">{taskDetails?.timeline || "NA"}</p>
+          <p>Timeline : </p>
+          <p className="text-red-600 gap-1">
+            <span>{taskDetails?.timeline || "NA"} </span>
+            <span> {taskDetails?.duetime || ""}</span>
+          </p>
         </div>
         <div className="flex items-center gap-2 mb-2">
           <p>Status : </p>
@@ -49,7 +50,6 @@ const EventCard = ({ taskDetails }) => {
         </div>
       </div>
     </div>
-    
   );
 };
 

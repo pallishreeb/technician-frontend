@@ -16,29 +16,62 @@ const Events = () => {
   const [loading, setLoading] = useState(false);
   const [calenderLoading, setCalenderLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  useEffect(() => {
-    const filterTasksByDate = (date) => {
-      setLoading(true);
-      filterBydates(date, authState?.token)
-        .then((res) => {
-          setTasksOfSelectedDate(res.data);
-          console.log(res.data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          toast.error(
-            error?.response?.data?.message ||
-              "Something Went Wrong, Please Try Later"
-          );
-          setLoading(false);
-          console.log(error);
-        });
-    };
-    if (selectedDate) {
-      const formattedDate = format(selectedDate, "dd-MM-yyyy");
-      filterTasksByDate(formattedDate);
-    }
-  }, [selectedDate]);
+useEffect(() => {
+  const filterTasksByDate = (date) => {
+    setLoading(true);
+    filterBydates(date, authState?.token)
+      .then((res) => {
+        const sortByDueTime = (a, b) => {
+          const parseTime = (timeString) => {
+            const [hours, minutes, period] = timeString
+              .match(/(\d+):(\d+) (\w+)/)
+              .slice(1);
+            const totalMinutes =
+              ((parseInt(hours) % 12) +
+                (period.toLowerCase() === "pm" ? 12 : 0)) *
+                60 +
+              parseInt(minutes);
+
+            return {
+              totalMinutes,
+              period,
+            };
+          };
+
+          const timeA = parseTime(a.duetime);
+          const timeB = parseTime(b.duetime);
+
+          if (timeA.period !== timeB.period) {
+            return timeA.period.localeCompare(timeB.period);
+          }
+
+          return timeA.totalMinutes - timeB.totalMinutes;
+        };
+
+        const sortedData = res.data.sort(sortByDueTime);
+
+        setTasksOfSelectedDate(sortedData);
+        console.log(sortedData);
+        setLoading(false);
+      })
+      .catch((error) => {
+        toast.error(
+          error?.response?.data?.message ||
+            "Something Went Wrong, Please Try Later"
+        );
+        setLoading(false);
+        console.log(error);
+      });
+  };
+
+  if (selectedDate) {
+    const formattedDate = format(selectedDate, "dd-MM-yyyy");
+    filterTasksByDate(formattedDate);
+  }
+}, [selectedDate]);
+
+
+
 
   return (
     <div>
@@ -83,8 +116,8 @@ const Events = () => {
           <div className="grid xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3  gap-4">
             {/* Map through eventsData and render event cards */}
             {tasksOfSelectedDate.map((taskOfSelectedDate, index) => (
-            <Link to={`/job/${taskOfSelectedDate.id}`}>
-              <EventCard  taskDetails={taskOfSelectedDate} />
+              <Link to={`/job/${taskOfSelectedDate.id}`}>
+                <EventCard taskDetails={taskOfSelectedDate} />
               </Link>
             ))}
           </div>

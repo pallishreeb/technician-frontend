@@ -170,7 +170,8 @@ function JobDetails() {
           <div className="mt-4 flex items-center">
             <FaCalendarAlt className="text-gray-400 mr-2" />
             <p className="text-gray-700">
-              Due Date: {jobDetails?.timeline || "NA"}
+              Timeline: {jobDetails?.timeline || "NA"}{" "}
+              {jobDetails?.duetime || ""}
             </p>
           </div>
           <div className="mt-4 flex items-center">

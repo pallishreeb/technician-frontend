@@ -85,6 +85,7 @@ function Form() {
   useEffect(() => {
     getApartments();
   }, [apartments?.length]);
+
   const handleSubmit = (e) => {
     setLoading(true);
     e.preventDefault();
@@ -97,13 +98,16 @@ function Form() {
       return toast.warning("Please Choose The Technician");
     }
     const date = data?.timeline ? new Date(data.timeline) : null;
-    const formatted = date !== null && format(date, "dd-MM-yyyy");
-    console.log(formatted);
+    // Format date as "dd-MM-yyyy"
+    const formattedDate = date ? format(date, "dd-MM-yyyy") : "";
+    // Format time as "hh:mm a" where 'a' represents AM/PM
+    const formattedTime = date ? format(date, "hh:mm a") : "";
     const status = technician && data?.timeline ? "Assigned" : "Unscheduled";
     const length = jobResponsibilities.length;
     const jobDetails = {
       ...data,
-      timeline: data?.timeline && formatted,
+      timeline: formattedDate,
+      duetime: formattedTime,
       status,
       apartment: apartment && apartment.id,
       technician: technician && technician.id,
@@ -112,7 +116,8 @@ function Form() {
     };
     const jobToSave = {
       ...data,
-      timeline: formatted,
+      timeline: formattedDate,
+      duetime: formattedTime,
       status,
       apartment: apartment,
       technician: technician,
@@ -144,6 +149,7 @@ function Form() {
         console.log(error, "error add job form");
       });
   };
+  console.log(data.timeline);
   return (
     <div className="container mx-auto p-4 lg:p-8  md:max-w-3xl xl:max-w-4xl ">
       <form
@@ -204,7 +210,7 @@ function Form() {
         <div>
           <label htmlFor="timeline">Date</label>
           <input
-            type="date"
+            type="datetime-local"
             id="timeline"
             name="timeline"
             min={currentDate}
