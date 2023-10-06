@@ -17,7 +17,11 @@ const DeleteImageModal = ({
     deleteImage(jobId, imageName, authState?.token)
       .then((response) => {
         const newImages = imageUrls.filter((img) => img !== imageName);
-        setSelectedImage(newImages[0]);
+        if(newImages?.length > 0){
+          setSelectedImage(newImages[0]);
+        }else {
+          setSelectedImage(null);
+        }
         setImageUrls(newImages);
         console.log("response from delete", response);
         setModal(false);
