@@ -1,4 +1,5 @@
-// export const url = "http://localhost:5000/api"
-export const url = "http://45.79.124.168/api"
-export const imgUrl = "http://45.79.124.168/uploads/"
+// export const url  = "http://localhost:5000/api"
+// export const imgUrl = "http://localhost:5000/uploads/"
+export const url = "https://dev.ensyncit.com/api"
+export const imgUrl = "https://dev.ensyncit.com/uploads/"
 

@@ -32,7 +32,7 @@ function Form() {
   const [loading, setLoading] = useState(false);
   const [jobLoading, setJobLoading] = useState(false);
 
-  const [jobResponsibilities, setJobResponsibilities] = useState([""]);
+  const [jobResponsibilities, setJobResponsibilities] = useState([]);
   const [jobDetails, setJobDetails] = useState(null);
   const [apartment, setApartment] = useState(null);
   const [technician, setTechnician] = useState(null);
@@ -72,6 +72,7 @@ function Form() {
     }
   };
   function convertApiDateTimeToLocal(apiDate, apiTime) {
+    console.log("time", apiDate, apiTime);
     // Combine date and time strings
     const combinedDateTimeString = `${apiDate} ${apiTime}`;
 
@@ -94,7 +95,7 @@ function Form() {
         console.log(res.data);
         setJobDetails(res?.data);
         if (res?.data?.responsibilities?.length > 0) {
-          setJobResponsibilities(res.data.responsibilities);
+          setJobResponsibilities(res.data.responsibilities.split(","));
         }
         setApartment({
           id: res.data?.apartment,
@@ -164,19 +165,28 @@ function Form() {
   }, [apartments?.length]);
   useEffect(() => {}, []);
 
+  const formattedTimeDate = (jobDetails) => {
+    let formattedTime = null;
+    let formattedDate = null;
+    if (jobDetails?.timeline !== "") {
+      // Split date and time from the datetime-local input
+      const dateTimeValue = jobDetails?.timeline;
+      const [datePart, timePart] = dateTimeValue && dateTimeValue.split("T");
+      // Format the date and time for the API
+      const date = datePart ? parse(datePart, "yyyy-MM-dd", new Date()) : null;
+      formattedDate = date !== null ? format(date, "dd-MM-yyyy") : null;
+
+      const parsedTime = parse(timePart, "HH:mm", new Date());
+      formattedTime =
+        parsedTime !== null ? format(parsedTime, "hh:mm aa") : null;
+    }
+    return { formattedTime, formattedDate };
+  };
+
   const handleSubmit = (e) => {
     setLoading(true);
     e.preventDefault();
-    // Split date and time from the datetime-local input
-    const dateTimeValue = jobDetails?.timeline;
-    const [datePart, timePart] = dateTimeValue.split("T");
-    // Format the date and time for the API
-    const date = datePart ? parse(datePart, "yyyy-MM-dd", new Date()) : null;
-    const formattedDate = date !== null ? format(date, "dd-MM-yyyy") : null;
-
-    const parsedTime = parse(timePart, "HH:mm", new Date());
-    const formattedTime =
-      parsedTime !== null ? format(parsedTime, "hh:mm aa") : null;
+    let { formattedTime, formattedDate } = formattedTimeDate(jobDetails);
     const length = jobResponsibilities.length;
     const jobForm = {
       ...jobDetails,
@@ -329,42 +339,71 @@ function Form() {
           />
         </div>
 
-        {/* JobResponsibilities Inputs */}
+        {/* Job Responsibilities Inputs */}
         <div className="md:col-span-2">
           <label htmlFor="responsibilities">Job responsibilities</label>
-          {jobResponsibilities?.map((responsibility, index) => (
-            <div key={index} className="flex items-center gap-2">
+          {jobResponsibilities && jobResponsibilities.length > 0 ? (
+            jobResponsibilities.map((responsibility, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  id={`responsibility-${index}`}
+                  name={`responsibility-${index}`}
+                  placeholder="Job Responsibility"
+                  value={responsibility}
+                  onChange={(e) =>
+                    handleResponsibilityChange(index, e.target.value)
+                  }
+                  className="w-full rounded-md border border-gray-300 p-2 mb-2"
+                />
+                {jobResponsibilities.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveResponsibility(index)}
+                    className="text-red-500"
+                  >
+                    <IoIosRemove />
+                  </button>
+                )}
+                {index === jobResponsibilities.length - 1 && (
+                  <button
+                    type="button"
+                    onClick={handleAddResponsibility}
+                    className="text-blue-500"
+                  >
+                    <RiAddLine />
+                  </button>
+                )}
+              </div>
+            ))
+          ) : (
+            // Render an empty input box for adding responsibilities
+            <div className="flex items-center gap-2">
               <input
                 type="text"
-                id="responsibilities"
-                name="responsibilities"
                 placeholder="Job Responsibility"
-                value={responsibility}
-                onChange={(e) =>
-                  handleResponsibilityChange(index, e.target.value)
-                }
+                value={jobResponsibilities}
+                onChange={(e) => setJobResponsibilities([e.target.value])}
                 className="w-full rounded-md border border-gray-300 p-2 mb-2"
               />
-              {index !== 0 && (
+              {jobResponsibilities && jobResponsibilities.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => handleRemoveResponsibility(index)}
+                  onClick={handleRemoveResponsibility}
                   className="text-red-500"
                 >
                   <IoIosRemove />
                 </button>
               )}
-              {index === jobResponsibilities?.length - 1 && (
-                <button
-                  type="button"
-                  onClick={handleAddResponsibility}
-                  className="text-blue-500"
-                >
-                  <RiAddLine />
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={handleAddResponsibility}
+                className="text-blue-500"
+              >
+                <RiAddLine />
+              </button>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Submit and Cancel Buttons */}

@@ -7,14 +7,14 @@ import {
   FaTrashAlt,
   FaEye,
   FaEyeSlash,
-  FaSpinner,
+  FaSpinner
 } from "react-icons/fa";
 import { GET_TECHNICIANS } from "../context/constansts";
 import { useTaskApi } from "../context/taskContext/taskProvider";
 import { getAllTechnicians } from "../networkCalls";
 import { toast } from "react-toastify";
 import { useAuthApi } from "../context/authContext/authProvider";
-
+import nodata from "../assets/nodata.png";
 const TechnicianTable = ({
   setDeleteModal,
   setModal,
@@ -22,19 +22,36 @@ const TechnicianTable = ({
   setTechnicianToDelete,
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(null);
   const { dispatch, state } = useTaskApi();
   const { state: authState } = useAuthApi();
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if(error === 401){
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+    }
+  }, [error]);
   const getTechnicians = async () => {
+    setLoading(true)
     try {
       const res = await getAllTechnicians(authState?.token);
       dispatch({ type: GET_TECHNICIANS, payload: res.data });
+      setLoading(false)
     } catch (error) {
-      toast.error(
-        error?.response?.data?.message ||
-          "Something Went Wrong, Please Try Later"
-      );
-      console.log(error);
+      if(error?.response?.status === 401){
+        setError(401)
+        setLoading(false)
+      }else{
+        toast.error(
+          error?.response?.data?.message ||
+            "Something Went Wrong, Please Try Later"
+        );
+        setLoading(false)
+      }
+    
     }
   };
 
@@ -63,11 +80,17 @@ const TechnicianTable = ({
   // Calculate the current page's data
   const offset = currentPage * perPage;
   const currentPageData = state.technicians?.slice(offset, offset + perPage);
+  if (loading === true)
+  return (
+    <div class=" relative flex justify-center items-center mt-4">
+      <FaSpinner className="w-1/6 h-1/6 animate-spin text-purple-500" />
+    </div>
+  );
   if (currentPageData.length === 0)
     return (
-      <div class=" relative flex justify-center items-center mt-4">
-        <FaSpinner className="w-1/6 h-1/6 animate-spin text-purple-500" />
-      </div>
+      <div className="flex justify-center items-center">
+      <img src={nodata} alt="404" className="w-1/6 h-1/6" />
+    </div>
     );
   return (
     <div className="container mx-auto mt-8">

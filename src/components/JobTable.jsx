@@ -141,7 +141,7 @@ const JobTable = ({ setDeleteModal, tasks, setJobToDelete }) => {
           breakClassName={
             "px-3 py-2 border rounded-md cursor-pointer transition-colors hover:bg-indigo-500 hover:text-white"
           }
-          disabledClassName={"bg-gray-500 text-white    "}
+          disabledClassName={"bg-gray-500 text-white"}
           activeClassName={"bg-indigo-500 text-white"}
         />
       </div>

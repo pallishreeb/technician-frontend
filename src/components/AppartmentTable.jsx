@@ -8,6 +8,7 @@ import { GET_APARTMENTS } from "../context/constansts";
 import { useTaskApi } from "../context/taskContext/taskProvider";
 import { toast } from "react-toastify";
 import { useAuthApi } from "../context/authContext/authProvider";
+import nodata from "../assets/nodata.png";
 const JobTable = ({
   setDeleteModal,
   setModal,
@@ -15,18 +16,34 @@ const JobTable = ({
   setAppartmentToDelete,
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(false);
   const { dispatch, state } = useTaskApi();
   const { state: authState } = useAuthApi();
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    if(error === 401){
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+    }
+  }, [error]);
   const getApartments = async () => {
+    setLoading(true)
     try {
       const res = await getAllApartments(authState?.token);
       dispatch({ type: GET_APARTMENTS, payload: res.data });
+      setLoading(false)
     } catch (error) {
-      toast.error(
-        error?.response?.data?.message ||
-          "Something Went Wrong, Please Try Later"
-      );
-      console.log(error);
+      if(error?.response?.status === 401){
+        setError(401)
+        setLoading(false)
+      }else{
+        toast.error(
+          error?.response?.data?.message ||
+            "Something Went Wrong, Please Try Later"
+        );
+        setLoading(false)
+      }
+    
     }
   };
 
@@ -45,11 +62,17 @@ const JobTable = ({
   // Calculate the current page's data
   const offset = currentPage * perPage;
   const currentPageData = state.apartments?.slice(offset, offset + perPage);
-  if (currentPageData.length === 0)
+  if (loading === true)
     return (
       <div class=" relative flex justify-center items-center mt-4">
         <FaSpinner className="w-1/6 h-1/6 animate-spin text-purple-500" />
       </div>
+    );
+    if (currentPageData.length === 0)
+    return (
+      <div className="flex justify-center items-center">
+      <img src={nodata} alt="404" className="w-1/6 h-1/6" />
+    </div>
     );
   return (
     <div className="container mx-auto mt-8">

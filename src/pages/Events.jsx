@@ -16,6 +16,13 @@ const Events = () => {
   const [loading, setLoading] = useState(false);
   const [calenderLoading, setCalenderLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    if(error === 401){
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+    }
+  }, [error]);
 useEffect(() => {
   const filterTasksByDate = (date) => {
     setLoading(true);
@@ -55,12 +62,17 @@ useEffect(() => {
         setLoading(false);
       })
       .catch((error) => {
-        toast.error(
-          error?.response?.data?.message ||
-            "Something Went Wrong, Please Try Later"
-        );
-        setLoading(false);
-        console.log(error);
+        if(error?.response?.status === 401){
+          setError(401)
+          setLoading(false);
+        }else{
+          toast.error(
+            error?.response?.data?.message ||
+              "Something Went Wrong, Please Try Later"
+          );
+          setLoading(false);
+        }
+   
       });
   };
 

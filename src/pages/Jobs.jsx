@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
+import { toast } from "react-toastify";
 import { getAllJobs, getAllTechnicians, getAnalytics } from "../networkCalls";
 import {
   GET_TASKS,
@@ -17,7 +18,8 @@ import JobTable from "../components/JobTable";
 import DeleteModal from "../components/DeleteModal";
 import AnalyticsCard from "../components/AnalyticsCard";
 import { useAuthApi } from "../context/authContext/authProvider";
-import { toast } from "react-toastify";
+
+
 function Jobs() {
   const navigate = useNavigate();
   const [jobToDelete, setJobToDelete] = useState(null);
@@ -28,6 +30,14 @@ function Jobs() {
   const { state: authState } = useAuthApi();
   // State to store data
   const [analytics, setAnalytics] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if(error === 401){
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+    }
+  }, [error]);
 
   const getJobs = async () => {
     setLoading(true);
@@ -37,11 +47,17 @@ function Jobs() {
         setLoading(false);
       })
       .catch((error) => {
-        toast.error(
-          error?.response?.data?.message ||
-            "Something Went Wrong, Please Try Later"
-        );
-        setLoading(false);
+        if(error?.response?.status === 401){
+          setError(401)
+          setLoading(false);
+        }else{
+          toast.error(
+            error?.response?.data?.message ||
+              "Something Went Wrong, Please Try Later"
+          );
+          setLoading(false);
+        }
+       
         // console.log(error);
       });
   };
@@ -50,11 +66,16 @@ function Jobs() {
       const res = await getAnalytics(authState?.token);
       setAnalytics(res?.data);
     } catch (error) {
-      toast.error(
-        error?.response?.data?.message ||
-          "Something Went Wrong, Please Try Later"
-      );
-      console.log(error);
+      if(error?.response?.status === 401){
+        setError(401)
+      }else{
+        toast.error(
+          error?.response?.data?.message ||
+            "Something Went Wrong, Please Try Later"
+        );
+      }
+      
+      // console.log(error);
     }
   };
   const getTechnicians = async () => {
@@ -62,11 +83,16 @@ function Jobs() {
       const res = await getAllTechnicians(authState?.token);
       dispatch({ type: GET_TECHNICIANS, payload: res.data });
     } catch (error) {
-      toast.error(
-        error?.response?.data?.message ||
-          "Something Went Wrong, Please Try Later"
-      );
-      console.log(error);
+      if(error?.response?.status === 401){
+        setError(401)
+      }else{
+        toast.error(
+          error?.response?.data?.message ||
+            "Something Went Wrong, Please Try Later"
+        );
+      }
+     
+      // console.log(error);
     }
   };
   const FilterByStatus = () => {
@@ -102,6 +128,7 @@ function Jobs() {
         break;
     }
   };
+
   useEffect(() => {
     FilterByStatus();
   }, [filter]);
